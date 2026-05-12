@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuenta de Cobro</title>
+<link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Allura&family=Dancing+Script:wght@700&family=Great+Vibes&family=Pacifico&family=Sacramento&family=Pinyon+Script&family=Satisfy&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ══ CENTURY GOTHIC GLOBAL ══ */
+:root{--cg:'Century Gothic','Trebuchet MS','Calibri',Arial,sans-serif}
+body{font-family:var(--cg);background:#f0f2f5;min-height:100vh;color:#111;font-size:14px}
+
+/* ══ TOPBAR ══ */
+.topbar{background:#1B3358;color:#fff;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.26);position:sticky;top:0;z-index:200;font-family:var(--cg)}
+.tb-l{display:flex;align-items:center;gap:9px;min-width:0;overflow:hidden}
+.tb-ico{width:28px;height:28px;background:rgba(255,255,255,.14);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.tb-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-sub{font-size:10.5px;opacity:.5;margin-top:1px;white-space:nowrap}
+.tb-r{display:flex;gap:7px;flex-shrink:0}
+.tbtn{padding:6px 13px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--cg);transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.tbtn-g{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
+.tbtn-g:hover{background:rgba(255,255,255,.18)}
+.tbtn-w{background:#fff;color:#1B3358}
+.tbtn-w:hover{background:#edf2fb}
+@media(max-width:600px){.topbar{padding:0 14px;height:48px}.tb-sub,.tbtn-g{display:none}.tb-name{font-size:13px}}
+
+/* ══ FORMAT TOGGLE ══ */
+.fmt-bar{background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 0;display:flex;justify-content:center;font-family:var(--cg)}
+.fmt-inner{display:flex;gap:3px;background:#f1f3f7;border-radius:9px;padding:3px}
+.ftab{display:flex;align-items:center;gap:6px;padding:8px 20px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;color:#6b7280;transition:all .15s;user-select:none;white-space:nowrap}
+.ftab input{display:none}
+.ftab.on{background:#1B3358;color:#fff;box-shadow:0 2px 6px rgba(27,51,88,.3)}
+@media(max-width:560px){.ftab{padding:8px 12px;font-size:12px}}
+
+/* ══ PAGE ══ */
+.page{max-width:820px;margin:28px auto 60px;padding:0 16px}
+
+/* ══ DOCUMENT CARD ══ */
+.doc-card{background:#fff;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.09),0 8px 28px rgba(0,0,0,.07);padding:54px 62px;font-family:var(--cg);color:#111;font-size:14px;line-height:1.72}
+@media(max-width:640px){.doc-card{padding:30px 22px}}
+
+/* ══ INLINE INPUTS ══ */
+.inp{border:none;border-bottom:1.5px dashed #93c5fd;background:transparent;font-family:var(--cg);font-size:inherit;color:inherit;outline:none;padding:1px 3px;transition:all .15s;min-width:38px}
+.inp:hover{border-bottom-color:#60a5fa}
+.inp:focus{border-bottom-color:#2563eb;background:#eff6ff;border-radius:3px 3px 0 0}
+.inp::placeholder{color:#aab0ba;font-style:italic}
+.inp-xs{width:55px}.inp-sm{width:75px}.inp-md{width:140px}.inp-lg{width:220px}.inp-xl{width:100%}
+.inp-num{width:120px}
+.inp-area{width:100%;resize:none;overflow:hidden;display:block;min-height:1.72em;line-height:1.72;padding-bottom:2px;font-family:var(--cg)}
+select.inp{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center;padding-right:18px;-webkit-appearance:none;appearance:none;min-width:70px}
+
+/* ══ DOC STRUCTURE ══ */
+.doc-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.doc-num-area{font-size:22px;font-weight:700;color:#1B3358;line-height:1.2}
+.doc-num-area .sub{font-size:16px;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:4px}
+.doc-date-area{text-align:right;font-size:13px;padding-top:5px;flex-shrink:0;color:#333}
+
+.doc-hr{border:none;border-top:1.5px solid #1B3358;margin:2px 0 16px}
+.doc-hr2{border:none;border-top:1px solid #ccc;margin:13px 0}
+.doc-hr-light{border:none;border-top:1px dashed #d1d5db;margin:13px 0}
+
+.doc-co{margin-bottom:16px}
+.doc-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#1B3358;margin-bottom:6px}
+.doc-sec{margin-bottom:14px}
+.doc-id-line{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:3px}
+
+.doc-suma{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px;margin-bottom:14px}
+.doc-suma .lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#1B3358}
+.doc-pago{font-size:14px;line-height:1.9;margin-bottom:4px}
+.bank-b{display:none;line-height:1.9}
+.bank-b.show{display:block}
+
+/* ══ DECLARATION BLOCK ══ */
+#declBlock{display:none;margin:14px 0}
+.decl-box{padding:14px 16px;border-left:3px solid #1B3358;background:#f7f8fb;border-radius:0 4px 4px 0;font-size:13.5px;line-height:1.85}
+.decl-box p{margin-bottom:4px}
+.decl-box .dnum{font-weight:700;color:#1B3358;margin-top:8px}
+.decl-box .dconcl{margin-top:10px;font-style:italic;color:#333}
+
+/* ══ SIGNATURE ZONE ══ */
+.sig-zone{margin-top:38px;padding-top:10px;border-top:1px solid #e5e7eb}
+.sig-display{min-height:66px;display:flex;align-items:flex-end;margin-bottom:4px}
+.sig-display img{max-height:66px;max-width:200px}
+.sig-under{border-top:1.2px solid #111;width:260px;padding-top:7px;margin-top:4px}
+.sig-uname{font-size:13px;font-weight:700;color:#0d1a2a;font-family:var(--cg)}
+.sig-ucc{font-size:12px;color:#555;margin-top:1px;font-family:var(--cg)}
+
+/* ══ SIGNATURE CREATOR ══ */
+.sig-cr{margin-top:18px;padding-top:14px;border-top:1px dashed #d1d5db}
+.sig-crlbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;margin-bottom:9px;font-family:var(--cg)}
+.sig-tbar{display:flex;gap:2px;background:#f1f3f6;border-radius:8px;padding:3px;margin-bottom:11px;font-family:var(--cg)}
+.stab{flex:1;padding:7px 3px;border-radius:6px;text-align:center;font-size:11.5px;font-weight:700;cursor:pointer;color:#6b7280;transition:all .15s;white-space:nowrap}
+.stab.on{background:#fff;color:#1B3358;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
+/* Draw */
+.cv-box{border:1.5px dashed #d1d5db;border-radius:8px;background:#fafbfc;position:relative}
+#sigCv{display:block;touch-action:none;width:100%;cursor:crosshair;border-radius:7px}
+.cv-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#b8c8d8;font-size:12px;pointer-events:none;line-height:1.8;font-family:var(--cg)}
+.btn-del{margin-top:8px;float:right;padding:5px 12px;font-size:11.5px;border-radius:5px;border:1px solid #fca5a5;background:#fff;cursor:pointer;color:#dc2626;font-family:var(--cg);font-weight:700;transition:all .15s}
+.btn-del:hover{background:#fef2f2}
+
+/* Type */
+.type-inp{width:100%;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;font-family:var(--cg);color:#111;background:#fff;outline:none;transition:border-color .14s;margin-bottom:11px}
+.type-inp:focus{border-color:#1B3358;box-shadow:0 0 0 3px rgba(27,51,88,.1)}
+.font-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;font-family:var(--cg)}
+@media(max-width:560px){.font-grid{grid-template-columns:repeat(2,1fr)}}
+.fopt{border:2px solid #e2e8f0;border-radius:9px;padding:9px 6px;text-align:center;cursor:pointer;transition:all .15s;background:#fff}
+.fopt:hover{border-color:#93c5fd;background:#f0f6ff}
+.fopt.sel{border-color:#1B3358;background:#ebf1fb}
+.fprev{font-size:24px;color:#1B3358;line-height:1.3;min-height:32px;display:flex;align-items:center;justify-content:center}
+.flbl{font-size:9.5px;color:#9ca3af;margin-top:3px;font-weight:700;letter-spacing:.2px;font-family:var(--cg)}
+
+/* Upload */
+.ubox{border:1.5px dashed #d1d5db;border-radius:8px;padding:18px;text-align:center;cursor:pointer;background:#fafbfc;color:#6b7280;font-size:13px;transition:all .15s;font-family:var(--cg)}
+.ubox:hover{border-color:#1B3358;background:#f0f4fb}
+.ubox .uico{font-size:26px;margin-bottom:5px}
+#imgWrap{display:none;margin-top:10px;text-align:center}
+#imgEl{max-height:80px;max-width:100%;border:1px solid #e2e8f0;border-radius:6px}
+
+/* ══ FOOTER + ACTIONS ══ */
+.doc-foot{margin-top:24px;padding-top:9px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af;display:flex;justify-content:space-between;font-family:var(--cg)}
+.action-row{display:flex;justify-content:center;gap:10px;margin-top:22px;font-family:var(--cg);flex-wrap:wrap}
+.abtn{padding:11px 24px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:var(--cg);transition:all .15s;display:flex;align-items:center;gap:6px}
+.abtn-p{background:#1B3358;color:#fff}
+.abtn-p:hover{background:#152b4e}
+.abtn-s{background:#fff;color:#4b5563;border:1.5px solid #d1d5db}
+.abtn-s:hover{background:#f9fafb;border-color:#9ca3af}
+
+/* ══ PRINT ══ */
+#pOnly{display:none}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  html,body{margin:0;padding:0;background:#fff}
+  body>*{display:none!important}
+  #pOnly{display:block!important;font-family:'Century Gothic','Trebuchet MS','Calibri',Arial,sans-serif;font-size:13.5px;color:#111;padding:28px 36px;line-height:1.72}
+  @page{size:A4 portrait;margin:12mm}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="tb-l">
+    <div class="tb-ico">📃</div>
+    <div>
+      <div class="tb-name">Cuenta de Cobro — Colombia</div>
+      <div class="tb-sub">Persona Natural · Soporte Fiscal</div>
+    </div>
+  </div>
+  <div class="tb-r">
+    <button class="tbtn tbtn-g" onclick="doEj()">Ejemplo</button>
+    <button class="tbtn tbtn-g" onclick="doLimpiar()">Limpiar</button>
+    <button class="tbtn tbtn-w" onclick="doPDF()">⬇ Descargar PDF</button>
+  </div>
+</header>
+
+<!-- FORMAT TOGGLE -->
+<div class="fmt-bar">
+  <div class="fmt-inner">
+    <label class="ftab on" id="ftab1">
+      <input type="radio" name="fmt" value="1" checked onchange="onFmt()">
+      📄 Cuenta de Cobro
+    </label>
+    <label class="ftab" id="ftab2">
+      <input type="radio" name="fmt" value="2" onchange="onFmt()">
+      📋 Con Manifiesto
+    </label>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+<div class="doc-card" id="docCard">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="doc-num-area">
+      Cuenta de cobro
+      <div class="sub">No.&nbsp;<input id="f_num" class="inp inp-sm" placeholder="001" oninput="save()"></div>
+    </div>
+    <div class="doc-date-area">
+      <input id="f_ciudad" class="inp inp-md" placeholder="Ciudad" oninput="save()">,&nbsp;<input id="f_fecha" class="inp inp-md" placeholder="día de mes de año" oninput="save()">
+    </div>
+  </div>
+
+  <hr class="doc-hr">
+
+  <!-- EMPRESA -->
+  <div class="doc-co">
+    <input id="emp_nom" class="inp inp-xl" placeholder="NOMBRE DE LA EMPRESA" oninput="save()" style="font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.3px">
+    <div style="margin-top:4px">NIT:&nbsp;<input id="emp_nit" class="inp inp-md" placeholder="000.000.000-0" oninput="save()"></div>
+  </div>
+
+  <hr class="doc-hr2">
+
+  <!-- DEBE A -->
+  <div class="doc-sec">
+    <div class="doc-lbl">DEBE A:</div>
+    <div style="margin-top:4px"><input id="pn_nom" class="inp inp-xl" placeholder="Nombre completo" oninput="save();updSig()"></div>
+    <div class="doc-id-line">
+      <select id="id_tipo" class="inp inp-sm" onchange="save();updSig()">
+        <option value="C.C.">C.C.</option>
+        <option value="NIT">NIT</option>
+        <option value="Pasaporte">Pasaporte</option>
+        <option value="PPT">PPT</option>
+        <option value="PEP">PEP</option>
+        <option value="C.E.">C.E.</option>
+      </select>
+      <input id="pn_id" class="inp inp-md" placeholder="Número de documento" oninput="save();updSig()">
+    </div>
+  </div>
+
+  <!-- SUMA -->
+  <div class="doc-suma">
+    <span class="lbl">LA SUMA DE:</span>&nbsp;
+    <span id="wds">—</span>&nbsp;
+    (<input id="f_val" class="inp inp-num" type="number" placeholder="0" min="0" oninput="updW();save()">)
+  </div>
+
+  <!-- CONCEPTO -->
+  <div class="doc-sec">
+    <span class="doc-lbl">POR CONCEPTO DE:&nbsp;</span>
+    <textarea id="f_con" class="inp inp-area" placeholder="Descripción del servicio prestado..." oninput="autoH(this);save()" rows="2"></textarea>
+  </div>
+
+  <!-- DECLARACIÓN (solo formato 2) -->
+  <div id="declBlock">
+    <hr class="doc-hr-light">
+    <div class="decl-box">
+      <p style="font-weight:700">Manifiesto bajo la gravedad de juramento que:</p>
+      <p style="margin-top:6px"><span class="dnum">1.</span> Los servicios prestados corresponden a una actividad desarrollada de manera personal.</p>
+      <p style="margin-top:6px"><span class="dnum">2.</span> Para la ejecución de esta actividad NO he contratado ni vinculado dos (2) o más trabajadores o contratistas asociados a la actividad generadora de renta.</p>
+      <p style="margin-top:6px"><span class="dnum">3.</span> NO me encuentro obligado(a) a expedir factura electrónica.</p>
+      <p class="dconcl">En consecuencia, solicito que la retención en la fuente aplicable sea practicada conforme a lo establecido en el artículo 383 del Estatuto Tributario.</p>
+    </div>
+  </div>
+
+  <hr class="doc-hr2">
+
+  <!-- FORMA DE PAGO -->
+  <div class="doc-pago">
+    Forma de Pago:&nbsp;
+    <select id="f_met" class="inp" onchange="onMet();save()">
+      <option value="Efectivo">Efectivo</option>
+      <option value="Transferencia">Transferencia bancaria</option>
+      <option value="Cheque">Cheque</option>
+    </select>
+    <div class="bank-b" id="bankB">
+      <div style="margin-top:3px">Cuenta de&nbsp;<select id="b_tip" class="inp" onchange="save()"><option value="">tipo...</option><option>Ahorros</option><option>Corriente</option></select>&nbsp;—&nbsp;<select id="b_ban" class="inp" onchange="save()">
+        <option value="">Banco...</option>
+        <optgroup label="Bancos Tradicionales">
+          <option>Bancolombia</option><option>Banco de Bogotá</option><option>Davivienda</option>
+          <option>Banco de Occidente</option><option>Banco Popular</option><option>Banco Agrario</option>
+          <option>BBVA Colombia</option><option>Banco Itaú</option><option>Scotiabank Colpatria</option>
+          <option>Banco Caja Social</option><option>AV Villas</option><option>GNB Sudameris</option>
+          <option>Banco Finandina</option><option>Banco Pichincha</option><option>Coopcentral</option>
+        </optgroup>
+        <optgroup label="Bancos y Billeteras Digitales">
+          <option>Nequi</option><option>Daviplata</option><option>Nu Colombia</option>
+          <option>Pibank</option><option>Lulo Bank</option><option>Uala</option>
+          <option>Movii</option><option>Tpaga</option><option>Rappipay</option>
+          <option>Coink</option><option>Bold</option><option>Powwi</option><option>Payválida</option>
+        </optgroup>
+        <option>Otro</option>
+      </select></div>
+      <div>No&nbsp;<input id="b_num" class="inp inp-lg" placeholder="Número de cuenta" oninput="save()"></div>
+      <div style="font-size:13px;color:#555;margin-top:1px">Cédula del titular:&nbsp;<input id="b_ced" class="inp inp-md" placeholder="(opcional)" oninput="save()" style="font-size:13px"></div>
+    </div>
+  </div>
+
+  <!-- FIRMA -->
+  <div class="sig-zone">
+    <div class="sig-display" id="sigDisp"><div style="height:66px"></div></div>
+    <div class="sig-under">
+      <div class="sig-uname" id="suNom">________________________</div>
+      <div class="sig-ucc"  id="suID"></div>
+    </div>
+
+    <!-- CREATOR -->
+    <div class="sig-cr">
+      <div class="sig-crlbl">Configurar firma</div>
+      <div class="sig-tbar">
+        <div class="stab on"  onclick="setTab('draw',this)">✏️ Dibujar</div>
+        <div class="stab"     onclick="setTab('tipo',this)">Aa Escribir</div>
+        <div class="stab"     onclick="setTab('img',this)">📁 Subir</div>
+        <div class="stab"     onclick="setTab('none',this)">Sin firma</div>
+      </div>
+
+      <!-- Draw -->
+      <div id="sp_draw">
+        <div class="cv-box"><canvas id="sigCv" height="90"></canvas><div class="cv-hint" id="cvH">Dibuje su firma aquí<br><small>Clic y arrastre el mouse</small></div></div>
+        <button class="btn-del" onclick="clearCv()">✕ Borrar</button>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Type -->
+      <div id="sp_tipo" style="display:none">
+        <input class="type-inp" id="sigTxt" type="text" placeholder="Escriba su nombre completo para la firma..." oninput="onTxt()">
+        <div class="font-grid">
+          <div class="fopt sel" data-f="Dancing Script" onclick="selF(this)">
+            <div class="fprev" id="fp0" style="font-family:'Dancing Script',cursive">Firma</div>
+            <div class="flbl">Dancing Script</div>
+          </div>
+          <div class="fopt" data-f="Allura" onclick="selF(this)">
+            <div class="fprev" id="fp1" style="font-family:'Allura',cursive">Firma</div>
+            <div class="flbl">Allura</div>
+          </div>
+          <div class="fopt" data-f="Alex Brush" onclick="selF(this)">
+            <div class="fprev" id="fp2" style="font-family:'Alex Brush',cursive">Firma</div>
+            <div class="flbl">Alex Brush</div>
+          </div>
+          <div class="fopt" data-f="Great Vibes" onclick="selF(this)">
+            <div class="fprev" id="fp3" style="font-family:'Great Vibes',cursive">Firma</div>
+            <div class="flbl">Great Vibes</div>
+          </div>
+          <div class="fopt" data-f="Sacramento" onclick="selF(this)">
+            <div class="fprev" id="fp4" style="font-family:'Sacramento',cursive">Firma</div>
+            <div class="flbl">Sacramento</div>
+          </div>
+          <div class="fopt" data-f="Pacifico" onclick="selF(this)">
+            <div class="fprev" id="fp5" style="font-family:'Pacifico',cursive">Firma</div>
+            <div class="flbl">Pacifico</div>
+          </div>
+          <div class="fopt" data-f="Pinyon Script" onclick="selF(this)">
+            <div class="fprev" id="fp6" style="font-family:'Pinyon Script',cursive">Firma</div>
+            <div class="flbl">Pinyon Script</div>
+          </div>
+          <div class="fopt" data-f="Satisfy" onclick="selF(this)">
+            <div class="fprev" id="fp7" style="font-family:'Satisfy',cursive">Firma</div>
+            <div class="flbl">Satisfy</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload -->
+      <div id="sp_img" style="display:none">
+        <input type="file" id="sigFile" accept="image/*" style="display:none" onchange="onFile(event)">
+        <div class="ubox" onclick="document.getElementById('sigFile').click()">
+          <div class="uico">📁</div>
+          <div>Clic para seleccionar imagen de firma</div>
+          <div style="font-size:11px;margin-top:3px;color:#9ca3af">PNG, JPG, GIF</div>
+        </div>
+        <div id="imgWrap"><img id="imgEl"></div>
+      </div>
+
+      <!-- None -->
+      <div id="sp_none" style="display:none;padding:12px;text-align:center;color:#6b7280;font-size:13px">
+        El documento se generará sin espacio de firma.
+      </div>
+    </div><!-- /sig-cr -->
+  </div><!-- /sig-zone -->
+
+  <div class="doc-foot">
+    <span>Cuenta de Cobro · Colombia · Persona Natural</span>
+    <span>Los datos se guardan automáticamente</span>
+  </div>
+
+</div><!-- /doc-card -->
+
+<div class="action-row">
+  <button class="abtn abtn-s" onclick="doEj()">📋 Ver ejemplo</button>
+  <button class="abtn abtn-s" onclick="doLimpiar()">🗑 Limpiar todo</button>
+  <button class="abtn abtn-p" onclick="doPDF()">⬇ Descargar PDF</button>
+</div>
+</div><!-- /page -->
+
+<div id="pOnly"></div>
+
+<script>
+const MES=['','enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const U=['','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once','doce','trece','catorce','quince','dieciséis','diecisiete','dieciocho','diecinueve'];
+const D=['','diez','veinte','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'];
+const C=['','ciento','doscientos','trescientos','cuatrocientos','quinientos','seiscientos','setecientos','ochocientos','novecientos'];
+function g3(n){if(!n)return'';if(n===100)return'cien';let s='';const c=Math.floor(n/100),d=n%100;if(c)s+=C[c]+(d?' ':'');if(d<20)s+=U[d];else{const t=Math.floor(d/10),u=d%10;s+=D[t]+(u?' y '+U[u]:'');}return s;}
+function toW(n){n=Math.floor(Math.abs(n));if(!n)return'—';let r=n,p=[];const m=Math.floor(r/1e6);if(m){p.push(m===1?'un millón':g3(m)+' millones');r%=1e6;}const k=Math.floor(r/1e3);if(k){p.push(k===1?'mil':g3(k)+' mil');r%=1e3;}if(r)p.push(g3(r));return p.join(' ')+' pesos mcte';}
+function updW(){const v=parseFloat(document.getElementById('f_val').value)||0;const w=toW(v);document.getElementById('wds').textContent=v?w[0].toUpperCase()+w.slice(1):'—';}
+
+function autoH(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+
+/* FORMAT TOGGLE */
+function onFmt(){
+  const v=document.querySelector('input[name=fmt]:checked').value;
+  document.getElementById('declBlock').style.display=v==='2'?'block':'none';
+  document.getElementById('ftab1').classList.toggle('on',v==='1');
+  document.getElementById('ftab2').classList.toggle('on',v==='2');
+  save();
+}
+
+/* CANVAS */
+let sTab='draw',drawing=false,dirty=false,uploadURL=null,fontName='Dancing Script';
+const cv=document.getElementById('sigCv');
+const cx=cv.getContext('2d');
+function initCv(){
+  cv.width=cv.parentElement.clientWidth-4||360;
+  cx.strokeStyle='#1B3358';cx.lineWidth=1.8;cx.lineCap='round';cx.lineJoin='round';
+  const pt=e=>{const r=cv.getBoundingClientRect();const s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(cv.width/r.width),y:(s.clientY-r.top)*(cv.height/r.height)};};
+  cv.onmousedown=e=>{drawing=true;cx.beginPath();const p=pt(e);cx.moveTo(p.x,p.y)};
+  cv.onmousemove=e=>{if(!drawing)return;const p=pt(e);cx.lineTo(p.x,p.y);cx.stroke();dirty=true;document.getElementById('cvH').style.display='none';updSig()};
+  cv.onmouseup=cv.onmouseleave=()=>drawing=false;
+  cv.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;cx.beginPath();const p=pt(e);cx.moveTo(p.x,p.y)},{passive:false});
+  cv.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;const p=pt(e);cx.lineTo(p.x,p.y);cx.stroke();dirty=true;document.getElementById('cvH').style.display='none';updSig()},{passive:false});
+  cv.addEventListener('touchend',()=>drawing=false);
+}
+function clearCv(){cx.clearRect(0,0,cv.width,cv.height);dirty=false;document.getElementById('cvH').style.display='';updSig();}
+function setTab(t,el){sTab=t;document.querySelectorAll('.stab').forEach(x=>x.classList.remove('on'));el.classList.add('on');['draw','tipo','img','none'].forEach(x=>document.getElementById('sp_'+x).style.display=x===t?'':'none');updSig();}
+function selF(el){document.querySelectorAll('.fopt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');fontName=el.dataset.f;updSig();}
+function onTxt(){const v=document.getElementById('sigTxt').value||'Firma';document.querySelectorAll('.fprev').forEach(el=>el.textContent=v);updSig();}
+function onFile(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{uploadURL=ev.target.result;document.getElementById('imgEl').src=uploadURL;document.getElementById('imgWrap').style.display='';updSig();};r.readAsDataURL(f);}
+
+function updSig(){
+  const d=document.getElementById('sigDisp');
+  const nom=document.getElementById('pn_nom').value||'';
+  const tipo=document.getElementById('id_tipo').value||'C.C.';
+  const id=document.getElementById('pn_id').value||'';
+  document.getElementById('suNom').textContent=nom||'________________________';
+  document.getElementById('suID').textContent=id?tipo+' '+id:'';
+  if(sTab==='none'){d.innerHTML='<div style="height:66px"></div>';return;}
+  if(sTab==='draw'&&dirty){d.innerHTML=`<img src="${cv.toDataURL()}" style="max-height:66px;max-width:200px">`;return;}
+  if(sTab==='img'&&uploadURL){d.innerHTML=`<img src="${uploadURL}" style="max-height:66px;max-width:200px">`;return;}
+  if(sTab==='tipo'){const n=document.getElementById('sigTxt').value.trim();if(n){d.innerHTML=`<span style="font-family:'${fontName}',cursive;font-size:42px;color:#1B3358;line-height:1;display:inline-block">${n}</span>`;return;}}
+  d.innerHTML='<div style="height:66px"></div>';
+}
+
+function onMet(){const m=document.getElementById('f_met').value;document.getElementById('bankB').classList.toggle('show',m==='Transferencia');save();}
+
+/* VALUES */
+const gv=id=>document.getElementById(id)?.value||'';
+function getFmt(){return document.querySelector('input[name=fmt]:checked')?.value||'1';}
+
+function save(){
+  updSig();
+  try{localStorage.setItem('cc1v3',JSON.stringify({num:gv('f_num'),fecha:gv('f_fecha'),ciudad:gv('f_ciudad'),empNom:gv('emp_nom'),empNit:gv('emp_nit'),pnNom:gv('pn_nom'),idTipo:gv('id_tipo'),pnId:gv('pn_id'),val:gv('f_val'),con:gv('f_con'),met:gv('f_met'),bTip:gv('b_tip'),bBan:gv('b_ban'),bNum:gv('b_num'),bCed:gv('b_ced'),fmt:getFmt()}));}catch(e){}
+}
+
+function restore(){
+  try{const raw=localStorage.getItem('cc1v3');if(!raw)return;const d=JSON.parse(raw);
+    [['f_num','num'],['f_fecha','fecha'],['f_ciudad','ciudad'],['emp_nom','empNom'],['emp_nit','empNit'],['pn_nom','pnNom'],['id_tipo','idTipo'],['pn_id','pnId'],['f_val','val'],['f_con','con'],['f_met','met'],['b_tip','bTip'],['b_ban','bBan'],['b_num','bNum'],['b_ced','bCed']].forEach(([id,k])=>{const el=document.getElementById(id);if(el&&d[k]!==undefined)el.value=d[k];});
+    if(d.met==='Transferencia')document.getElementById('bankB').classList.add('show');
+    if(d.fmt==='2'){document.querySelector('input[name=fmt][value="2"]').checked=true;onFmt();}
+    document.querySelectorAll('.inp-area').forEach(autoH);
+    updW();updSig();
+  }catch(e){}
+}
+
+/* BUILD PRINT */
+function buildPrint(){
+  const sig=document.getElementById('sigDisp').innerHTML;
+  const suN=document.getElementById('suNom').textContent;
+  const suI=document.getElementById('suID').textContent;
+  const isFmt2=getFmt()==='2';
+  const bank=document.getElementById('f_met').value==='Transferencia';
+  const CG=`'Century Gothic','Trebuchet MS','Calibri',Arial,sans-serif`;
+  const declHTML=isFmt2?`
+<hr style="border:none;border-top:1px dashed #d1d5db;margin:13px 0">
+<div style="padding:12px 16px;border-left:3px solid #1B3358;background:#f7f8fb;border-radius:0 4px 4px 0;font-size:13px;line-height:1.85;font-family:${CG}">
+  <p style="font-weight:700;margin-bottom:6px">Manifiesto bajo la gravedad de juramento que:</p>
+  <p style="margin-top:6px"><span style="font-weight:700;color:#1B3358">1.</span> Los servicios prestados corresponden a una actividad desarrollada de manera personal.</p>
+  <p style="margin-top:6px"><span style="font-weight:700;color:#1B3358">2.</span> Para la ejecución de esta actividad NO he contratado ni vinculado dos (2) o más trabajadores o contratistas asociados a la actividad generadora de renta.</p>
+  <p style="margin-top:6px"><span style="font-weight:700;color:#1B3358">3.</span> NO me encuentro obligado(a) a expedir factura electrónica.</p>
+  <p style="margin-top:10px;font-style:italic;color:#333">En consecuencia, solicito que la retención en la fuente aplicable sea practicada conforme a lo establecido en el artículo 383 del Estatuto Tributario.</p>
+</div>`:'';
+
+  return`<div style="font-family:${CG};font-size:13.5px;color:#111;line-height:1.72">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+  <div>
+    <div style="font-size:22px;font-weight:700;color:#1B3358">Cuenta de cobro</div>
+    <div style="font-size:16px;font-weight:600;color:#1B3358;margin-top:3px">No.&nbsp;${gv('f_num')||'—'}</div>
+  </div>
+  <div style="text-align:right;font-size:13px;color:#333;padding-top:5px">${gv('f_ciudad')}${gv('f_ciudad')&&gv('f_fecha')?', ':''}${gv('f_fecha')}</div>
+</div>
+<hr style="border:none;border-top:1.5px solid #1B3358;margin:2px 0 14px">
+<div style="margin-bottom:14px">
+  <div style="font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.3px">${gv('emp_nom')||'—'}</div>
+  <div style="margin-top:3px">NIT:&nbsp;${gv('emp_nit')||'—'}</div>
+</div>
+<hr style="border:none;border-top:1px solid #ccc;margin:0 0 13px">
+<div style="margin-bottom:13px">
+  <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#1B3358;margin-bottom:5px">DEBE A:</div>
+  <div style="margin-bottom:2px">${gv('pn_nom')||'—'}</div>
+  <div>${gv('id_tipo')||'C.C.'}&nbsp;${gv('pn_id')||'—'}</div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:baseline;margin-bottom:13px">
+  <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#1B3358">LA SUMA DE:</span>&nbsp;
+  <span>${document.getElementById('wds').textContent}</span>&nbsp;
+  <span>(${gv('f_val')?new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',minimumFractionDigits:0}).format(parseFloat(gv('f_val'))):'$0'})</span>
+</div>
+<div style="margin-bottom:13px">
+  <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#1B3358">POR CONCEPTO DE:&nbsp;</span>${gv('f_con')||'—'}
+</div>
+${declHTML}
+<hr style="border:none;border-top:1px solid #ccc;margin:13px 0">
+<div style="font-size:14px;line-height:1.9">
+  Forma de Pago: <strong>${gv('f_met')||'Efectivo'}</strong>
+  ${bank&&(gv('b_tip')||gv('b_ban'))?'<br>Cuenta de '+(gv('b_tip')||'')+(gv('b_ban')?' '+gv('b_ban'):''):''}
+  ${bank&&gv('b_num')?'<br>No&nbsp;'+gv('b_num'):''}
+  ${bank&&gv('b_ced')?'<br>Cédula del titular: '+gv('b_ced'):''}
+</div>
+<div style="margin-top:38px">
+  <div style="min-height:66px;display:flex;align-items:flex-end;margin-bottom:4px">${sig}</div>
+  <div style="border-top:1.2px solid #111;width:260px;padding-top:7px;margin-top:4px">
+    <div style="font-size:13px;font-weight:700">${suN}</div>
+    <div style="font-size:12px;color:#555;margin-top:1px">${suI}</div>
+  </div>
+</div>
+</div>`;
+}
+
+function doPDF(){document.getElementById('pOnly').innerHTML=buildPrint();window.print();}
+
+/* EXAMPLE */
+function doEj(){
+  const h=new Date();const y=h.getFullYear();const m=h.getMonth()+1;const d=h.getDate();
+  [['f_num','001'],['f_fecha',`${d} de ${MES[m]} de ${y}`],['f_ciudad','Bucaramanga'],['emp_nom','CROM MEDICAL SUPPLIES SAS'],['emp_nit','901.407.047 - 2'],['pn_nom','Angie Nathaly Arenas Amorocho'],['id_tipo','C.C.'],['pn_id','1.098.774.150'],['f_val','100000'],['f_con','Digitación de información contable durante el mes de '+MES[m]+' de '+y],['f_met','Transferencia'],['b_tip','Ahorros'],['b_ban','Bancolombia'],['b_num','81436653336']].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});
+  document.getElementById('bankB').classList.add('show');
+  document.querySelectorAll('.inp-area').forEach(autoH);
+  updW();updSig();save();
+}
+
+/* CLEAN */
+function doLimpiar(){
+  if(!confirm('¿Limpiar todos los campos?'))return;
+  ['f_num','f_fecha','f_ciudad','emp_nom','emp_nit','pn_nom','pn_id','f_val','f_con','b_tip','b_ban','b_num','b_ced','sigTxt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('f_met').value='Efectivo';document.getElementById('id_tipo').value='C.C.';
+  document.getElementById('bankB').classList.remove('show');
+  clearCv();uploadURL=null;document.querySelectorAll('.fprev').forEach(el=>el.textContent='Firma');
+  document.querySelectorAll('.inp-area').forEach(autoH);
+  updW();updSig();localStorage.removeItem('cc1v3');
+}
+
+/* INIT */
+document.addEventListener('DOMContentLoaded',()=>{
+  initCv();
+  const h=new Date();
+  if(!gv('f_fecha'))document.getElementById('f_fecha').value=`${h.getDate()} de ${MES[h.getMonth()+1]} de ${h.getFullYear()}`;
+  restore();
+  document.querySelectorAll('.inp-area').forEach(autoH);
+  updW();updSig();
+});
+window.addEventListener('resize',()=>{
+  const w=cv.parentElement.clientWidth-4;
+  if(w>0&&w!==cv.width){const snap=dirty?cv.toDataURL():null;cv.width=w;cx.strokeStyle='#1B3358';cx.lineWidth=1.8;cx.lineCap='round';cx.lineJoin='round';if(snap){const i=new Image();i.onload=()=>cx.drawImage(i,0,0,w,cv.height);i.src=snap;}}
+});
+</script>
+</body>
+</html>
